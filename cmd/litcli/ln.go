@@ -685,6 +685,14 @@ var addInvoiceCommand = cli.Command{
 				"are multiple channels with the same " +
 				"asset ID present",
 		},
+		cli.StringFlag{
+			Name: "price_oracle_metadata",
+			Usage: "(optional) additional metadata to provide to the " +
+				"price oracle as a JSON string; can include " +
+				"information about the end user or authentication " +
+				"data for more accurate asset rates; maximum " +
+				"length is 32,768 bytes",
+		},
 	),
 	Action: addInvoice,
 }
@@ -749,10 +757,11 @@ func addInvoice(cli *cli.Context) error {
 
 	channelsClient := tchrpc.NewTaprootAssetChannelsClient(tapdConn)
 	resp, err := channelsClient.AddInvoice(ctx, &tchrpc.AddInvoiceRequest{
-		AssetId:     assetIDBytes,
-		GroupKey:    groupKeyBytes,
-		AssetAmount: assetAmount,
-		PeerPubkey:  rfqPeerKey,
+		AssetId:              assetIDBytes,
+		GroupKey:             groupKeyBytes,
+		AssetAmount:          assetAmount,
+		PeerPubkey:           rfqPeerKey,
+		PriceOracleMetadata:  cli.String("price_oracle_metadata"),
 		InvoiceRequest: &lnrpc.Invoice{
 			Memo:            cli.String("memo"),
 			RPreimage:       preimage,
